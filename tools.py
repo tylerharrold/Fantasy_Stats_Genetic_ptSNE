@@ -1,5 +1,7 @@
 import pandas as pd
 from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
 # need a function to write out the transformed data to a csv
 # NOTE this function should be altered to write datafile into a specific directory
 def write_csv(input_data, specified_filename):
@@ -22,6 +24,11 @@ def write_dna(directory, dna):
 	path = directory / 'dna.dna'
 	path.write_text(dna)
 
+# writes the area under curve of best fit
+def write_auc(directory, auc):
+	path = directory / 'auc.txt'
+	path.write_text(str(auc))
+
 # write loss data in specified directory in csv
 def write_loss(directory, loss):
 	path = directory / 'loss.csv'
@@ -32,3 +39,43 @@ def write_loss(directory, loss):
 def read_loss(directory):
 	path = directory / 'loss.csv'
 	return list(path.read_text())
+
+
+def write_gen_report_curves(directory , dna , loss):
+	# write our loss to csv file
+	write_loss(directory, loss)
+	write_dna(directory, dna)
+	# calculate curve of best fit
+	csv_target = directory / 'loss.csv'
+	csv = pd.read_csv(str(csv_target) , sep=',' , header=None)
+	vals = csv.values[0]
+	points = [(x,y) for x, y in enumerate(vals)]
+	x = [x for x,y in points]
+	y = [y for x,y in points]
+
+	z = np.polyfit(x, y, 2)
+	f = np.poly1d(z)
+	f_prime = np.polyint(f)
+	# we are always integrating from x[-1], the max x coordinate, to 0, so we only are concerned about the max value for def integral
+	area_under_curve = f_prime(x[-1])
+	write_auc(directory, area_under_curve)
+
+	x_new = np.linspace(x[0] , x[-1] , x[-1])
+	y_new = f(x_new)
+
+	# get name
+	pltname = get_name_from_dir_path(directory)
+
+	# plot the datapoints and the curve of best fit on top of it
+	plt.plot(x,y,'b.')
+	plt.plot(x_new,y_new,'m-',linewidth=3)
+	filename = directory / pltname
+	plt.savefig(str(filename))
+	plt.clf()
+
+
+# WARNING, this makes this program windows dependent
+def get_name_from_dir_path(directory):
+	strs = str(directory).split('\\')
+	name = strs[-2] + '_' + strs[-1]
+	return name

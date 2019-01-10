@@ -69,9 +69,9 @@ def run_test(num_generations , gensize , testname , target_dir_name, test_data, 
             print(generation_name , " " , child_name , " trained")
 
         # now that children are trained, get the best two
-        one, two = eval.eval_using_last_loss(gen_dir)
+        one, two = eval.eval_using_area_under_curve(gen_dir)
         # generate graphs for our children
-        eval.generate_generation_perf_report(gen_dir)
+        #eval.generate_generation_perf_report(gen_dir)
         # use best two to breed
         child_dna = gh.breed_generation(gensize , [one,two])
         print(generation_name , ' Finished...beginning new generation')
@@ -85,13 +85,11 @@ def train_child(child_dir_path , dna, test_data, input_dims, output_dims , gh):
     ptsne = Parametric_tSNE(input_dims, output_dims, perplexity, all_layers=layers)
     # train it on test_data
     loss = ptsne.fit(test_data, verbose=False)
-    # write out our loss history
-    tools.write_loss(child_dir_path , loss)
     # save our model
     model_path = child_dir_path / 'model'
     ptsne.save_model(str(model_path))
-    # write our dna
-    tools.write_dna(child_dir_path , dna)
+    # write our loss, dna, and save a graph of performance
+    tools.write_gen_report_curves(child_dir_path , dna , loss)
     ptsne.clear_session()
 
 # given the name of a generation, analyze it
@@ -101,4 +99,4 @@ def analyze_generation():
 
 
 if __name__ == '__main__':
-    run_test(5,10,'MultiGenTest','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
+    run_test(1,2,'Area_Eval_Test','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
