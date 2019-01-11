@@ -8,29 +8,31 @@ from tools import write_csv
 
 test_data = "RBMTrainingDataset/2018_data.csv"
 test_data_path = Path.cwd() / 'RBMTrainingDataset' / '2018_data.csv'
-data = pd.read_csv(str(test_data_path) , sep=',' , header=None)
-input_dims = data.shape[1]
-print(input_dims)
-data = data.values
-print(data.shape)
+train_data_path = Path.cwd() / 'RBMTrainingDataset' / 'training_set.csv'
+test_data = pd.read_csv(str(test_data_path) , sep=',' , header=None)
+training_data = pd.read_csv(str(train_data_path) , sep=',' , header=None)
+training_data = training_data.values
+input_dims = test_data.shape[1]
+test_data = test_data.values
 output_dims = 2
+save_path = Path.cwd() / 'model_load_test'
 
-load_target = Path.cwd() / 'TestData' / 'Area_Eval_Test' / 'generation_1' / 'child_1'
 
-dna_path = load_target / 'dna.dna'
+ptsne = Parametric_tSNE(input_dims, output_dims, 30)
+ptsne.fit(training_data)
+tform = ptsne.transform(test_data)
+write_csv(tform , str(Path.cwd() / 'initial_tform.csv'))
+ptsne.save_model(str(save_path))
+ptsne.clear_session()
 
-dna = dna_path.read_text()
 
-g = Genetics(8 , 12)
-perplexity , layers = g.decode_dna(dna)
 
-model_path = load_target / 'model'
 
-ptsne = Parametric_tSNE(input_dims , output_dims, perplexity)
-ptsne.restore_model(str(model_path) , num_perplexities=perplexity)
+ptsne = Parametric_tSNE(input_dims , output_dims, 30)
+ptsne.restore_model(str(save_path) , num_perplexities=30)
 
-target_test_file = Path.cwd() / 'test_predic.csv'
+target_test_file = Path.cwd() / 'loaded_tform.csv'
 
-predic = ptsne.transform(data)
+predic = ptsne.transform(test_data)
 
 write_csv(predic, str(target_test_file))

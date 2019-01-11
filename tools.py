@@ -40,11 +40,21 @@ def read_loss(directory):
 	path = directory / 'loss.csv'
 	return list(path.read_text())
 
+def write_perplexity(directory, perplexity):
+	path = directory / 'perplexity.txt'
+	path.write_text(str(perplexity))
 
-def write_gen_report_curves(directory , dna , loss):
+def write_shape(directory, shape):
+	path = directory / 'shape.txt'
+	path.write_text(str(shape))
+
+
+def write_gen_report_curves(directory , dna , loss, perplexity, shape):
 	# write our loss to csv file
 	write_loss(directory, loss)
 	write_dna(directory, dna)
+	write_perplexity(directory,perplexity)
+	write_shape(directory, shape)
 	# calculate curve of best fit
 	csv_target = directory / 'loss.csv'
 	csv = pd.read_csv(str(csv_target) , sep=',' , header=None)

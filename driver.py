@@ -89,7 +89,7 @@ def train_child(child_dir_path , dna, test_data, input_dims, output_dims , gh):
     model_path = child_dir_path / 'model'
     ptsne.save_model(str(model_path))
     # write our loss, dna, and save a graph of performance
-    tools.write_gen_report_curves(child_dir_path , dna , loss)
+    tools.write_gen_report_curves(child_dir_path , dna , loss, perplexity, layers)
     ptsne.clear_session()
 
 # given the name of a generation, analyze it
@@ -99,4 +99,4 @@ def analyze_generation():
 
 
 if __name__ == '__main__':
-    run_test(1,2,'Area_Eval_Test','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
+    run_test(5,10,'NormalizedGenTestCurve','TestData' , "Normalized_Training_Data/training_set_normalized.csv" , 2)
