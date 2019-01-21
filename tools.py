@@ -10,7 +10,12 @@ def write_csv(input_data, specified_filename):
 	df = pd.DataFrame(input_data)
 
 	# write it out
-	df.to_csv(path_or_buf=specified_filename , sep=',' , index=False, header=None)
+	df.to_csv(path_or_buf=str(specified_filename) , sep=',' , index=False, header=None)
+
+# given a path to a csv file, returns ndarray of data
+def get_ndarray(csv_path):
+	data = pd.read_csv(str(csv_path) , sep=',' , header=None)
+	return data.values
 
 # function that writes to a file called test_specs at the target location
 # the 'shape' of a ptsne test, in bytes

@@ -1,8 +1,4 @@
 # Overall driver for rounds of genetic experimentation on ptsne network
-
-
-pass
-
 # imports
 import tools
 from pathlib import Path
@@ -12,6 +8,14 @@ from core import Parametric_tSNE
 import pandas as pd
 import eval
 import Genetics
+
+def train():
+    for gen in range(num_generations):
+        run_generation()
+
+def run_generation(genetics):
+    pass
+
 
 # run the breeding for GENERATIONS with GENSIZE with TESTNAME in DIRNAME
 def run_test(num_generations , gensize , testname , target_dir_name, test_data, output_dims, max_layers=8 , bits_per_layer=12):
