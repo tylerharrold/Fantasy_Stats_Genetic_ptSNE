@@ -50,4 +50,3 @@ def generate_generation_perf_report(generation_directory):
         filename = dir / 'plot.png'
         plt.savefig(str(filename))
         plt.clf()
-        # do i need to clear plot?
