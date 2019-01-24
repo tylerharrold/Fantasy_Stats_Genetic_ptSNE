@@ -5,6 +5,7 @@ from pathlib import Path
 import os
 
 from core import Parametric_tSNE
+from report_writing import log_basic_test_params
 import pandas as pd
 import training_evaluation as eval
 import Genetics
@@ -19,7 +20,12 @@ def train(num_generations, size_generation, base_directory, test_name,  data_pat
     # get initial gene pool
     gene_pool = genetic_helper.breed_generation(size_generation)
 
+    # setup test directory
     base_directory = tools.setup_file_structure(base_directory , test_name)
+
+    # log the parameters of our test
+    log_basic_test_params(base_directory , test_name , num_generations, generation_size, input_dims, output_dims, max_layers, bits_per_layer, evaluation_type)
+
 
     for generation in [i+1 for i in range(num_generations)]:
         generation_name = "generation_" + str(generation)

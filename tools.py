@@ -47,11 +47,6 @@ def write_loss(directory, loss):
 
 # reads loss from folder path and returns list
 # Note, needs fixing
-'''
-def read_loss(directory):
-	path = directory / 'loss.csv'
-	return list(path.read_text())
-'''
 def read_loss(directory):
 	path = directory / 'loss.csv'
 	csv = pd.read_csv(str(path) , sep=',' , header=None)
