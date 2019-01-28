@@ -24,7 +24,7 @@ def train(num_generations, size_generation, base_directory, test_name,  data_pat
     base_directory = tools.setup_file_structure(base_directory , test_name)
 
     # log the parameters of our test
-    log_basic_test_params(base_directory , test_name , num_generations, generation_size, input_dims, output_dims, max_layers, bits_per_layer, evaluation_type)
+    log_basic_test_params(base_directory , test_name , num_generations, size_generation, input_dims, output_dims, max_layers, bits_per_layer, evaluation_type)
 
 
     for generation in [i+1 for i in range(num_generations)]:
@@ -65,4 +65,4 @@ def train_child(dna , genetic_helper , test_data, input_dims, output_dims, log=F
 
 if __name__ == '__main__':
     #run_test(40,5,'LongShallowGenTestCurve','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
-    train(2 , 2 , 'FunkyData' , 'refactor_test' , 'RBMTrainingDataset/training_set.csv' , log=True )
+    train(40, 10 , 'TestData' , 'long_half_curve_test' , 'RBMTrainingDataset/training_set.csv' , log=True , save_model=False , evaluation_type="half_curve" )

@@ -12,7 +12,7 @@ import random as rand
 '''
 
 class Genetics(object):
-    def __init__(self, maximum_possible_layers , bits_per_layer, mutation_chance=0.1):
+    def __init__(self, maximum_possible_layers=8 , bits_per_layer=12, mutation_chance=0.1):
         self.maximum_possible_layers = maximum_possible_layers
         self.bits_per_layer = bits_per_layer
         self.mutation_chance = mutation_chance
@@ -27,6 +27,8 @@ class Genetics(object):
 
         perplexity = self._generate_perplexity_prepend()
         blueprint = perplexity + blueprint
+        while not self._is_valid_structure(blueprint):
+            blueprint = self._generate_blueprint()
         return blueprint
 
     def _generate_perplexity_prepend(self):
@@ -47,7 +49,9 @@ class Genetics(object):
         splice_point = self._random_splice_point(len(m1))
 
         newchild = m1[:splice_point] + m2[splice_point:]
-        return self._is_valid_structure(newchild)
+        while not self._is_valid_structure(newchild):
+            newchild = self._breed_bitstrings(b1, b2)
+        return newchild
 
     def _mutate(self, bitstring):
         mutant = ''
@@ -62,18 +66,24 @@ class Genetics(object):
                 mutant = mutant + str(bit_to_flip)
             else:
                 mutant = mutant + str(bit)
-        return self._is_valid_structure(mutant)
+        while not self._is_valid_structure(mutant):
+            mutant = self._mutate(bitstring)
+        return mutant
 
     def _is_valid_structure(self, blueprint):
+        is_valid = True
         MIN_PERPLEXITY = 5
         MAX_PERPLEXITY = 50
-        perp_bits = blueprint[:6]
-        intval = int(perp_bits , 2)
-        if intval < 5:
-            perp_bits = '{0:06b}'.format(MIN_PERPLEXITY)
-        elif intval > 50:
-            perp_bits = '{0:06b}'.format(MAX_PERPLEXITY)
-        return perp_bits + blueprint[6:]
+        perplexity, structure = self.decode_dna(blueprint)
+        if perplexity < 5:
+            is_valid = False
+        elif perplexity > 50:
+            is_valid = False
+
+        for val in structure:
+            if val <= 0:
+                is_valid = False
+        return is_valid
 
     def _read_blueprint_perplexity(self, blueprint):
         perplexity = blueprint[:6]

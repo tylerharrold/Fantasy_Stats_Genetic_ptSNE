@@ -49,7 +49,7 @@ def show_transformation_graph(path_to_data , path_to_labels, seg="position"):
         vis.graph_transformation_positions(data, labels)
 
 # save a graph of transformed dataset
-def save_transformation_graph(path_to_data , path_to_labels,  seg="position" , save_dir , save_name):
+def save_transformation_graph(path_to_data , path_to_labels , save_dir , save_name , seg="position"):
     data = get_ndarray(path_to_data)
     labels = get_ndarray(path_to_labels)
 
