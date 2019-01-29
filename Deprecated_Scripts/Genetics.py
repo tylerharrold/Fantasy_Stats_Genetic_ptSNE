@@ -12,11 +12,10 @@ import random as rand
 '''
 
 class Genetics(object):
-    def __init__(self, maximum_possible_layers=8 , bits_per_layer=12, mutation_chance=0.1, layer_crossbreed=False):
+    def __init__(self, maximum_possible_layers=8 , bits_per_layer=12, mutation_chance=0.1):
         self.maximum_possible_layers = maximum_possible_layers
         self.bits_per_layer = bits_per_layer
         self.mutation_chance = mutation_chance
-        self.layer_crossbreed = layer_crossbreed
 
     def _generate_blueprint(self):
         blueprint = ''
@@ -41,63 +40,17 @@ class Genetics(object):
         return rand.randint(1, len-2)
 
     def _breed_bitstrings(self, b1, b2):
-        if self.layer_crossbreed:
-            return self._breed_bitstrings_layerwise(b1,b2)
-        else:
-            if len(b1) != len(b2):
-                print("critical error")
-                quit()
-
-            m1 = self._mutate(b1)
-            m2 = self._mutate(b2)
-            splice_point = self._random_splice_point(len(m1))
-
-            newchild = m1[:splice_point] + m2[splice_point:]
-            while not self._is_valid_structure(newchild):
-                newchild = self._breed_bitstrings(b1, b2)
-            return newchild
-
-    def _breed_bitstrings_layerwise(self, b1, b2):
-        if len(b1) is not len(b2):
+        if len(b1) != len(b2):
             print("critical error")
             quit()
 
-        b1 = self._mutate(b1)
-        b2 = self._mutate(b2)
+        m1 = self._mutate(b1)
+        m2 = self._mutate(b2)
+        splice_point = self._random_splice_point(len(m1))
 
-        # using params, ascertain the amount of layer specifying genes plus perplexity specifyer
-        num_genes = self.maximum_possible_layers + 1
-        swap_segment = []
-
-        for i in range(num_genes):
-            rand_val = rand.random()
-            if rand_val <= self.mutation_chance:
-                swap_segment.append(1)
-            else:
-                swap_segment.append(0)
-
-        # iterate through, swapping segments if directed to
-        newchild = ""
-
-        # see if we need to swap perplexities
-        if swap_segment[0]:
-            newchild = newchild + b2[:6]
-        else:
-            newchild = newchild + b1[:6]
-
-        # potentially swap the rest
-        start = 6
-        end = start + self.bits_per_layer
-        for i in range(self.maximum_possible_layers):
-            if swap_segment[i+1]:
-                newchild = newchild + b2[start:end]
-            else:
-                newchild = newchild + b1[start:end]
-            start = end
-            end = start + self.bits_per_layer
-
+        newchild = m1[:splice_point] + m2[splice_point:]
         while not self._is_valid_structure(newchild):
-            newchild = self._breed_bitstrings_layerwise(b1,b2)
+            newchild = self._breed_bitstrings(b1, b2)
         return newchild
 
     def _mutate(self, bitstring):
