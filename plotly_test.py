@@ -6,8 +6,8 @@ import pandas as pd
 from tools import get_ndarray
 
 
-testfile = Path.cwd() / "40test.csv"
-labelsfile = Path.cwd() / "RBMTrainingDataset" / "2018_labels.csv"
+testfile = Path.cwd() / "40_newtest.csv"
+labelsfile = Path.cwd() / "RBMTrainingDataset" / "2018_labels_eos.csv"
 
 
 #data = get_ndarray(testfile)
@@ -31,7 +31,7 @@ pos_color_dict = {
 }
 
 
-d = {'x':data[0] , 'y':data[1] , 'name':labels[0] , 'team':labels[1] , 'pos':labels[2]}
+d = {'x':data[0] , 'y':data[1] , 'name':labels[0] , 'team':labels[2] , 'pos':labels[1]}
 merged = pd.DataFrame(data=d)
 
 cols = merged['pos'].map(pos_color_dict)
