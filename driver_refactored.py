@@ -12,7 +12,7 @@ import Genetics
 
 def train(num_generations, size_generation, base_directory, test_name,  data_path, output_dims=2, max_layers=8 , bits_per_layer=12, log=False, save_model=True, evaluation_type="curve"):
     # instance genetic helper
-    genetic_helper = Genetics.Genetics(max_layers , bits_per_layer)
+    genetic_helper = Genetics.Genetics(max_layers , bits_per_layer, layer_crossbreed=True)
     # load dataset as ndarray
     test_data = tools.get_ndarray(data_path)
     # get dimensionality of dataset
@@ -65,4 +65,4 @@ def train_child(dna , genetic_helper , test_data, input_dims, output_dims, log=F
 
 if __name__ == '__main__':
     #run_test(40,5,'LongShallowGenTestCurve','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
-    train(40, 10 , 'TestData' , 'long_half_curve_test' , 'RBMTrainingDataset/training_set.csv' , log=True , save_model=False , evaluation_type="half_curve" )
+    train(30, 40 , 'TestData' , 'half_curve_layer_swap_40' , 'RBMTrainingDataset/training_set.csv' , log=True , save_model=False , evaluation_type="half_curve" )
