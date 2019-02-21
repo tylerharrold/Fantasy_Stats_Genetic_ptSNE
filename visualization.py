@@ -2,6 +2,8 @@
 import matplotlib.pyplot as plt
 from pathlib import Path
 from visualization_tools import pos_color_dict as label_dict
+import pandas as pd
+import numpy as np
 
 
 # Note - some of the below functions are inherently dependent on the nature of the data
@@ -46,3 +48,30 @@ def get_plotlist(data_ndarray , labels_ndarray):
 # TODO
 def graph_transformation_fantasy_perf(data_ndarray, labels_ndarray):
     pass
+
+
+def graph_model_training_loss(path_to_directory, save_dir, save_filename):
+    # calculate curve of best fit
+	csv_target = path_to_directory / 'loss.csv'
+	csv = pd.read_csv(str(csv_target) , sep=',' , header=None)
+	vals = csv.values[0]
+	points = [(x,y) for x, y in enumerate(vals)]
+	x = [x for x,y in points]
+	y = [y for x,y in points]
+
+	z = np.polyfit(x, y, 2)
+	f = np.poly1d(z)
+	f_prime = np.polyint(f)
+	# we are always integrating from x[-1], the max x coordinate, to 0, so we only are concerned about the max value for def integral
+	area_under_curve = f_prime(x[-1])
+
+	x_new = np.linspace(x[0] , x[-1] , x[-1])
+	y_new = f(x_new)
+
+
+	# plot the datapoints and the curve of best fit on top of it
+	plt.plot(x,y,'b.')
+	plt.plot(x_new,y_new,'m-',linewidth=3)
+	filename = save_dir / save_filename
+	plt.savefig(str(filename))
+	plt.clf()

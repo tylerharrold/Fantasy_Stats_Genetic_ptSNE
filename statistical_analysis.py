@@ -35,7 +35,7 @@ def print_stats(json):
 
 
 if __name__ == "__main__":
-    report = Path.cwd() / "Reports" / "layer_swap_40_report" / "generation_30_report" / "gen_report.json"
+    report = Path.cwd() / "Reports" / "HC_LS_G30_N40_Report" / "generation_30_report" / "gen_report.json"
     with open(str(report)) as jsonfile:
         data = json.load(jsonfile)
     print_stats(data)

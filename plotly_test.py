@@ -6,7 +6,7 @@ import pandas as pd
 from tools import get_ndarray
 
 
-testfile = Path.cwd() / "40_newtest.csv"
+testfile = Path.cwd() / "Flat40vTrained40" / "best_of_trained_tform.csv"
 labelsfile = Path.cwd() / "RBMTrainingDataset" / "2018_labels_eos.csv"
 
 
@@ -51,4 +51,4 @@ layout = go.Layout(
 )
 
 data = [trace0]
-plot(data, filename="test.html")
+plot(data, filename="BestOfTrained.html")

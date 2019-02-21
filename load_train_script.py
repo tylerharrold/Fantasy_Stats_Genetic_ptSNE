@@ -27,8 +27,9 @@ def load_train_model_from_dna(model_save_name, output_dims=2):
     ptsne = Parametric_tSNE(input_dims, output_dims, perplexity, all_layers=layers)
     loss = ptsne.fit(test_data, verbose=False)
     ptsne.save_model(str(save_path))
+    ptsne.clear_session()
 
 
 
 if __name__ == "__main__":
-    load_train_model_from_dna("long_half_curve_gen_40_child_1.model")
+    load_train_model_from_dna("best_trained_40.model")

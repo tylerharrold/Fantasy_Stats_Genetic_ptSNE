@@ -65,4 +65,4 @@ def train_child(dna , genetic_helper , test_data, input_dims, output_dims, log=F
 
 if __name__ == '__main__':
     #run_test(40,5,'LongShallowGenTestCurve','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
-    train(30, 40 , 'TestData' , 'half_curve_layer_swap_40' , 'RBMTrainingDataset/training_set.csv' , log=True , save_model=False , evaluation_type="half_curve" )
+    train(1, 40 , 'TestData' , 'half_curve_layer_swap_flat_40' , 'RBMTrainingDataset/training_set.csv' , log=True , save_model=False , evaluation_type="half_curve" )

@@ -27,20 +27,21 @@ def record_mutation_rate(generation_name, mutation_rate):
     pass
 
 # save report for generation using the area under curve evaluation
-def write_generation_report_auc(generation_dir , write_dir):
+def write_generation_report_auc(generation_dir , write_dir, eval_type="auc"):
     data = {}
+    data['eval_type'] = eval_type
     data['children'] = []
     for child in [c for c in generation_dir.iterdir() if c.is_dir()]:
         child_write_dir = write_dir / (child.name + "_report")
         os.mkdir(str(child_write_dir))
-        child_data = get_child_report_auc(child , child_write_dir)
+        child_data = get_child_report_auc(child , child_write_dir, eval_type=eval_type)
         data['children'].append(child_data)
     # write the whole gen
     with open(str(write_dir / 'gen_report.json') , 'w') as outfile:
         json.dump(data , outfile)
 
 # given child record the dna, performance of each child in generation (using auc), the perplexity, and the shape
-def get_child_report_auc(child_dir , write_dir, dna_max_layers=8 , dna_bits_per_layer=12, write=True):
+def get_child_report_auc(child_dir , write_dir, dna_max_layers=8 , dna_bits_per_layer=12, write=True, eval_type='auc'):
     g = Genetics(dna_max_layers , dna_bits_per_layer)
     report = {}
     dna = tools.read_dna(child_dir)
@@ -50,8 +51,13 @@ def get_child_report_auc(child_dir , write_dir, dna_max_layers=8 , dna_bits_per_
     report['shape'] = shape
     report['name'] = child_dir.name
     loss = tools.read_loss(child_dir)
-    auc = tools.get_area_under_curve(loss)
-    report['area_under_curve'] = auc
+    if eval_type is 'auc':
+        auc = tools.get_area_under_curve(loss)
+    elif eval_type is 'half_auc':
+        auc = tools.get_area_under_half_curve(loss)
+    else:
+        print("critical error")
+    report[eval_type] = auc
 
     if write:
         with open(str(write_dir / 'report.json') , 'w') as outfile:
@@ -68,7 +74,7 @@ def get_child_report_auc(child_dir , write_dir, dna_max_layers=8 , dna_bits_per_
 
 # for a test, record the best performers for each generation, with option to automatically save for each generation individually
 # method for full sweep analysis of a test directory that saves reporting in one place
-def analyze_test(test_dir, report_dir):
+def analyze_test(test_dir, report_dir, eval_type="auc"):
     active_dir = Path.cwd()
     if (active_dir / report_dir) not in [x for x in active_dir.iterdir() if x.is_dir()]:
         os.mkdir(str(active_dir / report_dir))
@@ -79,4 +85,4 @@ def analyze_test(test_dir, report_dir):
     for generation in [x for x in test_dir.iterdir() if x.is_dir()]:
         gen_report_dir = report_dir / (generation.name + "_report")
         os.mkdir(str(gen_report_dir))
-        write_generation_report_auc(generation , gen_report_dir)
+        write_generation_report_auc(generation , gen_report_dir, eval_type=eval_type)
