@@ -1,8 +1,11 @@
 # file containing master function that accepts areguments to runa multi
 # generational ptsne training
-import directory_structures as dir_struct
+import io_tools as io
 import reporting
 from pathlib import Path
+from core import Parametric_tSNE
+from Genetics import Genetics as G
+import statistical_tools as stats
 '''
     inputs: testname                : name for the individual test
             num_gen                 : number of generations to run
@@ -22,11 +25,19 @@ from pathlib import Path
             variable_mutation_rate  : whether the program will change mutation rate from generation to generation (THIS FEATURE NOT CURRENTLY IMPLEMENTED)
 
 '''
-def train(testname , num_gen, gen_size, train_data , train_data_name , test_data , test_data_name , output_dim, eval_method, write_directory, g_layers, g_layersize , g_mutation_rate,  breed_method="layerwise" , save_model=False , variable_mutation_rate=False):
+def train(test_name , num_gen, gen_size, train_data , train_data_name , test_data , test_data_name , labels_data , labels_data_name , output_dim, eval_method, write_directory, g_layers, g_layersize , g_mutation_rate,  breed_method="layerwise" , save_model=False , variable_mutation_rate=False):
     # setup directory in write_directory with the name of the test
-    test_dir = setup_file_struct(write_directory , testname)
+    if not io.b_directory_exists(write_directory , test_name):
+        test_dir = io.create_subfolder(write_directory , test_name)
+    else:
+        print("directory already exists with that name, quitting to avoid overwriting data")
+        quit()
+
+    # glean the input dimensionality from the training data
+    input_dim = len(train_data[0])
+
     # within this directory, record the basic specs
-    record_test_specs(test_dir , testname , num_gen, gen_size , train_data_name , test_data_name , eval_method , variable_mutation_rate , g_layers, g_layersize, breed_method)
+    record_test_specs(test_dir , test_name , num_gen, gen_size , train_data_name , test_data_name , labels_data_name , eval_method , variable_mutation_rate , g_layers, g_layersize, breed_method, input_dim, output_dim)
 
     '''
     for generation in num_gen:
@@ -43,23 +54,45 @@ def train(testname , num_gen, gen_size, train_data , train_data_name , test_data
 
 
     '''
+    for generation in range(num_gen):
+        setup_generation_subdir()
+        for child in range(gen_size):
+            train_child()
+        evaluate_best_performers()
+        write_generational_reports()
+        breed_new_generation()
 
     pass
 
-# sets up file structure, returns the test's directory path
-def setup_file_struct(write_directory , testname):
-    if dir_struct.b_directory_exists(write_directory , testname):
-        print("directory already exists, quitting to avoid overwrite")
-        quit()
-    else:
-        dir_struct.create_directory(write_directory , testname)
-        return (write_directory / testname)
-
 # records the test specs in the top test directory
-def record_test_specs(test_dir , testname , num_gen , gen_size, train_data_name , test_data_name , eval_method , variable_mutation_rate , g_layers , g_layersize , breed_method):
+def record_test_specs(test_dir , test_name , num_gen , gen_size, train_data_name , test_data_name , labels_data_name , eval_method , variable_mutation_rate , g_layers , g_layersize , breed_method, input_dim , output_dim):
     filename = testname + "_report.json"
-    reporting.write_json(test_dir , filename , test_name=testname , num_gen=num_gen , gen_size=gen_size , train_data_name=train_data_name , test_data_name=test_data_name ,
-        eval_method=eval_method , variable_mutation_rate=variable_mutation_rate , g_layers=g_layers , g_layersize=g_layersize , breed_method=breed_method)
+    reporting.write_json(test_dir , filename , test_name=test_name , num_gen=num_gen , gen_size=gen_size , train_data_name=train_data_name , test_data_name=test_data_name ,
+        eval_method=eval_method , variable_mutation_rate=variable_mutation_rate , g_layers=g_layers , g_layersize=g_layersize , breed_method=breed_method, input_dim=input_dim , output_dim=output_dim , labels_data_name=labels_data_name)
+
+# train an individual child of a generation
+def train_child(gen_folder, child_name , input_dim , output_dim , dna , training_data , test_data , labels_data):
+    # setup folder
+    child_folder = io.create_subfolder(gen_folder , child_name)
+    # train ptsne
+    perplexity , layers = G.decode_dna(dna)
+    ptsne = Parametric_tSNE(input_dim , output_dim , perplexity , all_layers=layers)
+    losses = ptsne.fit(training_data , verbose=False)
+
+    # tform test data
+    tform = ptsne.transform(test_data)
+
+    # TODO ------ save if necessary the model ------------
+
+    # free memory
+    ptsne.clear_session()
+
+    # save data
+    knn_error = stats.get_knn_error(tform , labels_data)
+    eval_value = evaluate()
+    report_name = child_name + "_report.json"
+    reporting.write_json(child_folder , report_name , child_name=child_name , input_dim=input_dim , output_dim=output_dim , perplexity=perplexity , layers=layers , loss=losses , tform=tform , knn_error=knn_error, DNA=dna)
+    #produce_graphs()
 
 
 if __name__ == "__main__":
