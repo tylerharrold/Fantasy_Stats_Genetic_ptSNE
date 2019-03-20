@@ -17,6 +17,11 @@ class TestDirectoryStructures(unittest.TestCase):
     def test_knn_error(self):
         print(st.get_knn_error(data , labels))
 
+    def test_return_type(self):
+        knn = st.get_knn_error(data , labels)
+        self.assertTrue(isinstance(knn , float))
+
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -45,8 +45,6 @@ def get_knn_error(tform , labels):
 
     errors = 0
     for i in accuracy_table:
-        print(i[0])
-        print(i[1])
         if i[0] is not i[1]:
             errors = errors + 1
     num = len(accuracy_table)

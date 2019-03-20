@@ -15,7 +15,7 @@ import statistical_tools as stats
             test_data               : ndarray of data to test model with
             test_data_name          : the name of the test data file
             output_dim              : desired output dimensionality
-            eval_method             : method with which to judge 'fitness' of models (SEE: evaluation.py)
+            eval_type             : method with which to judge 'fitness' of models (SEE: evaluation.py)
             write_directory         : pathlib path to directory where all information will be stored for the test
             g_layers                : limit on number of layers a DNA string will contain
             g_layersize             : limit on size of an individual layer
@@ -25,7 +25,7 @@ import statistical_tools as stats
             variable_mutation_rate  : whether the program will change mutation rate from generation to generation (THIS FEATURE NOT CURRENTLY IMPLEMENTED)
 
 '''
-def train(test_name , num_gen, gen_size, train_data , train_data_name , test_data , test_data_name , labels_data , labels_data_name , output_dim, eval_method, write_directory, g_layers, g_layersize , g_mutation_rate,  breed_method="layerwise" , save_model=False , variable_mutation_rate=False):
+def train(test_name , num_gen, gen_size, train_data , train_data_name , test_data , test_data_name , labels_data , labels_data_name , output_dim, eval_type, write_directory, g_layers, g_layersize , g_mutation_rate,  breed_method="layerwise" , save_model=False , variable_mutation_rate=False):
     # setup directory in write_directory with the name of the test
     if not io.b_directory_exists(write_directory , test_name):
         test_dir = io.create_subfolder(write_directory , test_name)
@@ -37,7 +37,7 @@ def train(test_name , num_gen, gen_size, train_data , train_data_name , test_dat
     input_dim = len(train_data[0])
 
     # within this directory, record the basic specs
-    record_test_specs(test_dir , test_name , num_gen, gen_size , train_data_name , test_data_name , labels_data_name , eval_method , variable_mutation_rate , g_layers, g_layersize, breed_method, input_dim, output_dim)
+    record_test_specs(test_dir , test_name , num_gen, gen_size , train_data_name , test_data_name , labels_data_name , eval_type , variable_mutation_rate , g_layers, g_layersize, breed_method, input_dim, output_dim)
 
     '''
     for generation in num_gen:
@@ -54,30 +54,39 @@ def train(test_name , num_gen, gen_size, train_data , train_data_name , test_dat
 
 
     '''
+
+    # breed initial generation
+    generation = G.breed_generation(gen_size)
+
     for generation in range(num_gen):
         setup_generation_subdir()
         for child in range(gen_size):
             train_child()
-        evaluate_best_performers()
+        evaluate_best_performers() # this should be flexible enough to choose multiple best performers
         write_generational_reports()
         breed_new_generation()
 
     pass
 
 # records the test specs in the top test directory
-def record_test_specs(test_dir , test_name , num_gen , gen_size, train_data_name , test_data_name , labels_data_name , eval_method , variable_mutation_rate , g_layers , g_layersize , breed_method, input_dim , output_dim):
+def record_test_specs(test_dir , test_name , num_gen , gen_size, train_data_name , test_data_name , labels_data_name , eval_type , variable_mutation_rate , g_layers , g_layersize , breed_method, input_dim , output_dim):
     filename = testname + "_report.json"
     reporting.write_json(test_dir , filename , test_name=test_name , num_gen=num_gen , gen_size=gen_size , train_data_name=train_data_name , test_data_name=test_data_name ,
-        eval_method=eval_method , variable_mutation_rate=variable_mutation_rate , g_layers=g_layers , g_layersize=g_layersize , breed_method=breed_method, input_dim=input_dim , output_dim=output_dim , labels_data_name=labels_data_name)
+        eval_type=eval_type , variable_mutation_rate=variable_mutation_rate , g_layers=g_layers , g_layersize=g_layersize , breed_method=breed_method, input_dim=input_dim , output_dim=output_dim , labels_data_name=labels_data_name)
+
+# sets up the subdirectory for the training generation
+# ~~~~~~~~~~~~~~~~~~~ TODO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+def setup_generation_subdir():
+    pass
 
 # train an individual child of a generation
-def train_child(gen_folder, child_name , input_dim , output_dim , dna , training_data , test_data , labels_data):
+def train_child(gen_folder, child_name , input_dim , output_dim , dna , training_data , test_data , labels_data, eval_type , verbose=False):
     # setup folder
     child_folder = io.create_subfolder(gen_folder , child_name)
     # train ptsne
     perplexity , layers = G.decode_dna(dna)
     ptsne = Parametric_tSNE(input_dim , output_dim , perplexity , all_layers=layers)
-    losses = ptsne.fit(training_data , verbose=False)
+    losses = ptsne.fit(training_data , verbose=verbose)
 
     # tform test data
     tform = ptsne.transform(test_data)
@@ -89,10 +98,16 @@ def train_child(gen_folder, child_name , input_dim , output_dim , dna , training
 
     # save data
     knn_error = stats.get_knn_error(tform , labels_data)
-    eval_value = evaluate()
+    eval_value = evaluate(eval_type , losses)
     report_name = child_name + "_report.json"
     reporting.write_json(child_folder , report_name , child_name=child_name , input_dim=input_dim , output_dim=output_dim , perplexity=perplexity , layers=layers , loss=losses , tform=tform , knn_error=knn_error, DNA=dna)
-    #produce_graphs()
+
+    if eval_type is "knn_error":
+        evaluation = knn_error
+    else:
+        evaluation = eval_value
+
+    return evaluation
 
 
 if __name__ == "__main__":
