@@ -45,7 +45,7 @@ def get_knn_error(tform , labels):
 
     errors = 0
     for i in accuracy_table:
-        if i[0] is not i[1]:
+        if i[0][1] is not i[1][1]:
             errors = errors + 1
     num = len(accuracy_table)
     error_pctg = errors / num

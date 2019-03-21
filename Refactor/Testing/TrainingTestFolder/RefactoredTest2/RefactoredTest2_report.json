@@ -1,0 +1,1 @@
+{"variable_mutation_rate": false, "g_layers": 8, "labels_data_name": "2018_labels_eos.csv", "eval_type": "half_auc", "input_dim": 22, "test_name": "RefactoredTest2", "breed_method": "layerwise", "train_data_name": "training_set.csv", "g_layersize": 12, "test_data_name": "2018_data_eos.csv", "num_gen": 1, "output_dim": 2, "gen_size": 2}

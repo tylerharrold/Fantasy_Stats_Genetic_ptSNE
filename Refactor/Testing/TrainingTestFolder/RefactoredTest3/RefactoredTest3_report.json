@@ -1,0 +1,1 @@
+{"test_data_name": "2018_data_eos.csv", "test_name": "RefactoredTest3", "input_dim": 22, "breed_method": "layerwise", "num_gen": 2, "variable_mutation_rate": false, "output_dim": 2, "train_data_name": "training_set.csv", "g_layers": 8, "g_layersize": 12, "labels_data_name": "2018_labels_eos.csv", "gen_size": 4, "eval_type": "knn_error"}

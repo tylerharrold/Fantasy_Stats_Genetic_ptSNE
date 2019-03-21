@@ -16,7 +16,7 @@ import random as rand
 '''
 
 class Genetics(object):
-    def __init__(self, maximum_possible_layers=8 , bits_per_layer=12, mutation_chance=0.1, layer_crossbreed=False):
+    def __init__(self, maximum_possible_layers=8 , bits_per_layer=12, mutation_chance=0.1, layer_crossbreed=True):
         self.maximum_possible_layers = maximum_possible_layers
         if self.maximum_possible_layers <= 0 or self.maximum_possible_layers >= 256:
             self.maximum_possible_layers = 8

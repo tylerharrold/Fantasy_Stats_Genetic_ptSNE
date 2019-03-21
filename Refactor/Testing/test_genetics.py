@@ -81,7 +81,7 @@ class TestGenetics(unittest.TestCase):
             self.assertEqual(bits , gh.bits_per_layer)
 
     def test_structure_len(self):
-        for i in range(1000):
+        for i in range(10000):
             gh = _get_random_G()
             dna = gh._generate_blueprint()
             # the length of the dna should be the max layers times bits per layer plus 6 perp bits plus 16 struct bitstring
