@@ -10,9 +10,6 @@ import pandas as pd
 import training_evaluation as eval
 import Genetics
 
-
-TFORM_DATA = pd.read_csv(str(Path.cwd() / "RBMTrainingDataset" / "2018_data_eos.csv") , sep=',' , header=None).values
-
 def train(num_generations, size_generation, base_directory, test_name,  data_path, output_dims=2, max_layers=8 , bits_per_layer=12, log=False, save_model=True, evaluation_type="curve"):
     # instance genetic helper
     genetic_helper = Genetics.Genetics(max_layers , bits_per_layer, layer_crossbreed=True)
@@ -47,10 +44,9 @@ def run_generation(test_data, gene_pool, resident_directory, genetic_helper, inp
         # make a folder for the child
         child_dir = resident_directory / child_name
         os.mkdir(str(child_dir))
-        loss, model, tform = train_child(dna , genetic_helper, test_data, input_dims, output_dims, log)
+        loss, model = train_child(dna , genetic_helper, test_data, input_dims, output_dims, log)
         tools.write_loss(child_dir , loss)
         tools.write_dna(child_dir, dna)
-        tools.write_csv(tform , (child_dir / "tform.csv"))
         if save_model:
             model.save_model(str(child_dir / "model"))
         if log:
@@ -65,10 +61,8 @@ def train_child(dna , genetic_helper , test_data, input_dims, output_dims, log=F
     # train it on test_data
     loss = ptsne.fit(test_data, verbose=False)
 
-    tform = ptsne.transform(TFORM_DATA)
-
-    return loss, ptsne , tform
+    return loss, ptsne
 
 if __name__ == '__main__':
     #run_test(40,5,'LongShallowGenTestCurve','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
-    train(1, 40 , 'TestData' , 'knn_layer_swap_flat_40' , 'RBMTrainingDataset/training_set.csv' , log=True , save_model=False , evaluation_type="knn_error" )
+    train(1, 40 , 'TestData' , 'half_curve_layer_swap_flat_40' , 'RBMTrainingDataset/training_set.csv' , log=True , save_model=False , evaluation_type="half_curve" )

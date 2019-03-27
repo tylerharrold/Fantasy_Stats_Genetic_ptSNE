@@ -52,6 +52,11 @@ def read_loss(directory):
 	csv = pd.read_csv(str(path) , sep=',' , header=None)
 	return csv.values[0]
 
+def read_tform(directory):
+	path = directory / 'tform.csv'
+	csv = pd.read_csv(str(path) , sep=',' , header=None)
+	return csv.values
+
 def write_perplexity(directory, perplexity):
 	path = directory / 'perplexity.txt'
 	path.write_text(str(perplexity))
