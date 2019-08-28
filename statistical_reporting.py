@@ -16,6 +16,7 @@ LABELS = pd.read_csv(str(LABELS_PATH) , sep=',' , header=None).values
 
 CONTROL_GROUP = Path.cwd() / "TestData" / "knn_layer_swap_flat_40" / "generation_1"
 TEST_GROUP = Path.cwd() / "TestData" / "knn_layer_swap_40" / "generation_30"
+#test
 
 # for each generation, prints a report containing children's names, knn_errors, and dna
 def knn_error_reports(test_dir):
