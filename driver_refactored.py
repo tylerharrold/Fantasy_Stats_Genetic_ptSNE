@@ -11,7 +11,8 @@ import training_evaluation as eval
 import Genetics
 
 
-TFORM_DATA = pd.read_csv(str(Path.cwd() / "RBMTrainingDataset" / "2018_data_eos.csv") , sep=',' , header=None).values
+#TFORM_DATA = pd.read_csv(str(Path.cwd() / "RBMTrainingDataset" / "2018_data_eos.csv") , sep=',' , header=None).values
+TFORM_DATA = pd.read_csv(str(Path.cwd() / "Formatted_MNIST_Data" / "formatted_mnist_test.csv") , sep=',' , header=None).values
 
 def train(num_generations, size_generation, base_directory, test_name,  data_path, output_dims=2, max_layers=8 , bits_per_layer=12, log=False, save_model=True, evaluation_type="curve"):
     # instance genetic helper
@@ -71,4 +72,4 @@ def train_child(dna , genetic_helper , test_data, input_dims, output_dims, log=F
 
 if __name__ == '__main__':
     #run_test(40,5,'LongShallowGenTestCurve','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
-    train(1, 40 , 'TestData' , 'knn_layer_swap_flat_40' , 'RBMTrainingDataset/training_set.csv' , log=True , save_model=False , evaluation_type="knn_error" )
+    train(2, 4 , 'TestData' , 'mnist_small_trial' , 'Formatted_MNIST_Data/formatted_mnist_train.csv' , log=True , save_model=False , evaluation_type="half_curve" )

@@ -2,12 +2,16 @@ from pathlib import Path
 import json
 from tools import read_dna
 from tools import read_tform
+from tools import get_area_under_half_curve
+from tools import read_loss
 import pandas as pd
 from statistical_tools import get_knn_error
 import math
 
 TEST_DIR = Path.cwd() / "TestData" / "knn_layer_swap_40"
-LABELS_PATH = Path.cwd() / "RBMTrainingDataset" / "2018_labels_eos.csv"
+#LABELS_PATH = Path.cwd() / "RBMTrainingDataset" / "2018_labels_eos.csv"
+#LABELS = pd.read_csv(str(LABELS_PATH) , sep=',' , header=None).values
+LABELS_PATH = Path.cwd() / "Formatted_MNIST_Data" / "formatted_mnist_test_labels.csv"
 LABELS = pd.read_csv(str(LABELS_PATH) , sep=',' , header=None).values
 
 CONTROL_GROUP = Path.cwd() / "TestData" / "knn_layer_swap_flat_40" / "generation_1"
@@ -27,6 +31,23 @@ def knn_error_reports(test_dir):
             data[name] = {'knn_error':knn_error , 'dna' : dna}
         with open(str(gen_dir / "knn_error_report.json") , 'w') as json_file:
             json.dump(data , json_file)
+
+# for each generation prints a report containing childrens names, auc_errors, and dna
+def half_auc_error_reports(test_dir):
+    # iterate through every generation subfolder
+    for gen_dir in [x for x in test_dir.iterdir() if x.is_dir()]:
+        # create a dict to turn into a generational stat report
+        data = {}
+        for child_dir in [y for y in gen_dir.iterdir() if y.is_dir()]:
+            dna = read_dna(child_dir)
+            tform = read_tform(child_dir)
+            loss = read_loss(child_dir)
+            half_auc_error = get_area_under_half_curve(loss)
+            name = child_dir.name
+            data[name] = {'loss':half_auc_error , 'dna' : dna}
+        with open(str(gen_dir / "knn_error_report.json") , 'w') as json_file:
+            json.dump(data , json_file)
+
 
 
 # prints a json report of the mean, median and mode of the generation
