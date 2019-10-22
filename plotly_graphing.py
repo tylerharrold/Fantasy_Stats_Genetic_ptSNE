@@ -6,7 +6,7 @@ import pandas as pd
 from tools import get_ndarray
 
 
-labelsfile = Path.cwd() / "RBMTrainingDataset" / "2018_labels_eos.csv"
+labelsfile = Path.cwd() / "graphing_fantasy_performers" / "2018_labels_eos.csv"
 
 def plot_and_save(input_folder):
 
@@ -56,4 +56,4 @@ def mass_plot(test_dir):
 
 
 if __name__ == "__main__":
-    mass_plot((Path.cwd() / "TestData" / "knn_layer_swap_40"))
+    mass_plot((Path.cwd() / "TestData" / "knn_layer_swap_40_fantasy_top_100"))

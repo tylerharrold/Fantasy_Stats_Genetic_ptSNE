@@ -12,9 +12,10 @@ import Genetics
 
 
 #TFORM_DATA = pd.read_csv(str(Path.cwd() / "RBMTrainingDataset" / "2018_data_eos.csv") , sep=',' , header=None).values
-TFORM_DATA = pd.read_csv(str(Path.cwd() / "Formatted_MNIST_Data" / "formatted_mnist_test.csv") , sep=',' , header=None).values
+#TFORM_DATA = pd.read_csv(str(Path.cwd() / "Formatted_MNIST_Data" / "formatted_mnist_test.csv") , sep=',' , header=None).values
+TFORM_DATA = pd.read_csv(str(Path.cwd() / "Formatted_Combine_Data" / "2019_combine_normalized.csv") , sep=',' , header=None).values
 
-def train(num_generations, size_generation, base_directory, test_name,  data_path, output_dims=2, max_layers=8 , bits_per_layer=12, log=False, save_model=True, evaluation_type="curve"):
+def train(num_generations, size_generation, base_directory, test_name,  data_path, output_dims=3, max_layers=8 , bits_per_layer=12, log=False, save_model=True, evaluation_type="curve" , seed=None):
     # instance genetic helper
     genetic_helper = Genetics.Genetics(max_layers , bits_per_layer, layer_crossbreed=True)
     # load dataset as ndarray
@@ -22,7 +23,10 @@ def train(num_generations, size_generation, base_directory, test_name,  data_pat
     # get dimensionality of dataset
     input_dims = len(test_data[0])
     # get initial gene pool
-    gene_pool = genetic_helper.breed_generation(size_generation)
+    if seed is None:
+        gene_pool = genetic_helper.breed_generation(size_generation)
+    else:
+        gene_pool = genetic_helper.breed_generation(size_generation , seed)
 
     # setup test directory
     base_directory = tools.setup_file_structure(base_directory , test_name)
@@ -71,5 +75,8 @@ def train_child(dna , genetic_helper , test_data, input_dims, output_dims, log=F
     return loss, ptsne , tform
 
 if __name__ == '__main__':
+    #continue_dir = Path.cwd() / "TestData" / "normalized_fantasy_30_40_half_auc" / "generation_18"
+    #best = eval._eval_half_curve(continue_dir)
+    #seed = [best[0] , best[1]]
     #run_test(40,5,'LongShallowGenTestCurve','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
-    train(2, 4 , 'TestData' , 'mnist_small_trial' , 'Formatted_MNIST_Data/formatted_mnist_train.csv' , log=True , save_model=False , evaluation_type="half_curve" )
+    train(30, 40 , 'TestData' , 'normalized_combine_3D_30_40_half_auc' , 'Formatted_Combine_Data/combine_normalized.csv' , log=True , save_model=False , evaluation_type="half_curve")

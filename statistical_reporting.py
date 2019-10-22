@@ -46,7 +46,7 @@ def half_auc_error_reports(test_dir):
             half_auc_error = get_area_under_half_curve(loss)
             name = child_dir.name
             data[name] = {'loss':half_auc_error , 'dna' : dna}
-        with open(str(gen_dir / "knn_error_report.json") , 'w') as json_file:
+        with open(str(gen_dir / "half_auc_error_report.json") , 'w') as json_file:
             json.dump(data , json_file)
 
 
@@ -65,6 +65,26 @@ def gen_stats_knn(test_dir):
         sum = 0
         for i in gen_data:
             sum = sum + (gen_data[i]['knn_error'] - mean)**2
+        varience = sum / (len(gen_data) - 1)
+        std_dev = math.sqrt(varience)
+        n = len(gen_data)
+        stat_data = {'mean' : mean , 'var' : varience , 'std_dev' : std_dev , 'n' : n}
+        with open(str(gen_dir / "stat_report.json") , 'w') as outfile:
+            json.dump(stat_data , outfile)
+
+def gen_stats_half_auc(test_dir):
+    # iterate through every generation subfolder in a test
+    for gen_dir in [x for x in test_dir.iterdir() if x.is_dir()]:
+        # pull json
+        with open(str(gen_dir / "half_auc_error_report.json") , 'r') as json_file:
+            gen_data = json.load(json_file)
+        total_knn = 0
+        for i in gen_data:
+            total_knn = total_knn + gen_data[i]['loss']
+        mean = total_knn / len(gen_data)
+        sum = 0
+        for i in gen_data:
+            sum = sum + (gen_data[i]['loss'] - mean)**2
         varience = sum / (len(gen_data) - 1)
         std_dev = math.sqrt(varience)
         n = len(gen_data)
