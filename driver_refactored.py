@@ -13,7 +13,7 @@ import Genetics
 
 #TFORM_DATA = pd.read_csv(str(Path.cwd() / "RBMTrainingDataset" / "2018_data_eos.csv") , sep=',' , header=None).values
 #TFORM_DATA = pd.read_csv(str(Path.cwd() / "Formatted_MNIST_Data" / "formatted_mnist_test.csv") , sep=',' , header=None).values
-TFORM_DATA = pd.read_csv(str(Path.cwd() / "Formatted_Combine_Data" / "2019_combine_normalized.csv") , sep=',' , header=None).values
+TFORM_DATA = pd.read_csv(str(Path.cwd() / "Normalized_Fantasy_Data" / "normalized_test_set.csv") , sep=',' , header=None).values
 
 def train(num_generations, size_generation, base_directory, test_name,  data_path, output_dims=3, max_layers=8 , bits_per_layer=12, log=False, save_model=True, evaluation_type="curve" , seed=None):
     # instance genetic helper
@@ -79,4 +79,4 @@ if __name__ == '__main__':
     #best = eval._eval_half_curve(continue_dir)
     #seed = [best[0] , best[1]]
     #run_test(40,5,'LongShallowGenTestCurve','TestData' , "RBMTrainingDataset/training_set.csv" , 2)
-    train(30, 40 , 'TestData' , 'normalized_combine_3D_30_40_half_auc' , 'Formatted_Combine_Data/combine_normalized.csv' , log=True , save_model=False , evaluation_type="half_curve")
+    train(30, 40 , 'TestData' , 'normalized_fantasy_3D_30_40_half_auc' , 'Normalized_Fantasy_Data/normalized_training_set.csv' , log=True , save_model=False , evaluation_type="half_curve")
