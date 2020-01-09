@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import json
 from tools import get_ndarray
+from math import sqrt
 
 '''
 Tools for evaluating the performance of a parametric t-SNE network based on the single k-nearest neighbor for each
@@ -80,7 +81,7 @@ def create_gen_knn_error_json(root_folder , labels_file , labels_identifying_col
 		num_children += 1
 		name = child.name
 		tform = pd.read_csv(str(child / "tform.csv") , sep=',' , header=None).values
-		labels = pd.read_csv(str(labels_file) , sep=',' , header=None).values
+		labels = pd.read_csv(str(labels_file) , sep=',' , header=0).values
 		knn_error = avg_knn_error(tform , labels , labels_identifying_col)
 		data[name] = {'knn_error':knn_error}
 		generational_error += knn_error
@@ -93,6 +94,55 @@ def create_test_knn_error_reports(root_test_folder , labels_file , labels_identi
 	for generation in [x for x in root_test_folder.iterdir() if x.is_dir()]:
 		create_gen_knn_error_json(generation , labels_file , labels_identifying_col , title)
 
+
+# just want to say, this may be the most hideous, ponderous, illegible function ive ever writte (and ive written some bad ones) but it does what it needed to do
+def create_statistical_knn_report():
+	''' relevant tests:
+		normalized combine 2d flat 40 *
+		normalized combine 2d 30 40 *
+		normalized combine 3d flat 40 *
+		normalized combine 3d 30 40 *
+		hyper mutated combine 3d 30 40 *
+
+		normalized fantasy 2d flat 40 *
+		normalized fantasy 2d 30 40 *
+		normalized fantasy 3d flat 40
+		normalized fantasy 3d 30 40
+
+	'''
+	tests = [
+		Path.cwd() / "TestData" / "normalized_combine_flat_40_half_auc" ,
+		Path.cwd() / "TestData" / "normalized_combine_30_40_half_auc" ,
+		Path.cwd() / "TestData" / "normalized_combine_3D_flat_40" ,
+		Path.cwd() / "TestData" / "normalized_combine_3D_30_40_half_auc" ,
+		Path.cwd() / "TestData" / "hyper_mutate_normalized_combine_3D_30_40_half_auc" ,
+		Path.cwd() / "TestData" / "normalized_fantasy_flat_40_half_auc" ,
+		Path.cwd() / "TestData" / "normalized_fantasy_30_40_half_auc" ,
+		Path.cwd() / "TestData" / "normalized_fantasy_3D_flat_40_half_auc" ,
+		Path.cwd() / "TestData" / "normalized_fantasy_3D_30_40_half_auc"
+	]
+
+	for test in tests:
+		for generation in [folder for folder in test.iterdir() if folder.is_dir()]:
+			#grab the knn_eval_positional.json file
+			try:
+				with open(str(generation / 'knn_eval_positional.json') , 'r') as json_file:
+					gen_data = json.load(json_file)
+			except FileNotFoundError:
+				continue
+
+			mean_knn_error = gen_data.pop('avg_knn_error')
+
+			# check out this opaque shit
+			sigma = sum(map(lambda x: x * x , [child['knn_error'] - mean_knn_error for child in gen_data.values()]))
+			variance = sigma / (len(gen_data) - 1)
+
+			std_dev = sqrt(variance)
+
+			name = generation.name
+			data = {'name' : name , 'mean_knn_error' : mean_knn_error , 'std_dev' : std_dev}
+			with open(str(generation / 'knn_positional_statistics.json') , 'w') as outfile:
+				json.dump(data , outfile)
 
 if __name__ == "__main__":
 	#knn reports for normalized combine 3d trained
@@ -124,7 +174,17 @@ if __name__ == "__main__":
 	for sublist in test_list:
 		create_test_knn_error_reports(sublist[0] , sublist[1] , sublist[2] , 'positional')
 	'''
+
+	'''
 	# for flat 40 3d fantasy
 	create_test_knn_error_reports((Path.cwd() / "TestData" / "normalized_fantasy_3D_flat_40_half_auc") , (Path.cwd() / "RBMTrainingDataset" / "2018_labels_eos.csv"),1 , "positional")
 	# for 30-40 3d fantasy
 	create_test_knn_error_reports((Path.cwd() / "TestData" / "normalized_fantasy_3D_30_40_half_auc") , (Path.cwd() / "RBMTrainingDataset" / "2018_labels_eos.csv"),1 , "positional")
+	'''
+	# for hyper mutated
+	#combine_labels_file = Path.cwd() / "NFL_Combine_Data" / "2019Both.csv"
+	#create_test_knn_error_reports((Path.cwd() / "TestData" / "hyper_mutate_normalized_combine_3D_30_40_half_auc") , combine_labels_file, 1 , "positional")
+
+	# go through all relevant test dirs, and create a json file called knn_positional_statistics.json where i can see mean, var, std_dev of post
+	# trained knn evals
+	create_statistical_knn_report()

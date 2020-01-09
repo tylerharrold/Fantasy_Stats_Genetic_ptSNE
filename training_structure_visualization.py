@@ -51,6 +51,11 @@ def mark_child_as_previous_best_performer(child_data_list , list_of_prev_generat
     if child_dna in previous_gene_pool:
         child_data_list[0] = child_data_list[0] + '*****'
 
+# accepts a generation, which is a list of children, with each child being itself a list of the form [name, perplexity, structure , dna]
+def mark_child_as_best_performer(generation):
+    pass
+
+
 # for a test, iterate through each generation and print out results
 def get_test_structure_report(test_dir):
     genetic_helper = genetic_helper = Genetics()
@@ -96,11 +101,7 @@ def save_test_best_performers(test_dir , save_dir , save_name):
 
 
 if __name__ == "__main__":
-    test_names = ['normalized_combine_3D_30_40_half_auc' ,
-                'normalized_combine_30_40_half_auc' ,
-                'normalized_fantasy_3D_30_40_half_auc' ,
-                'normalized_fantasy_30_40_half_auc'
-    ]
+    test_names = ['hyper_mutate_normalized_combine_3D_30_40_half_auc']
 
     test_dir = Path.cwd() / "TestData"
     for name in test_names:

@@ -3,6 +3,8 @@ from pathlib import Path
 import json
 import pandas as pd
 from tform_plotting import plot_tform_2d
+from tform_plotting import plot_tform_3d
+from tform_plotting import plot_tform_2d_combine , plot_tform_3d_combine
 from plotly import __version__
 from plotly.offline import download_plotlyjs , init_notebook_mode , iplot, plot
 import plotly.graph_objs as go
@@ -54,8 +56,36 @@ def test_integrity(test_dir):
         print(generation.name + 's best performer was ' + child_name)
 
 if __name__ == "__main__":
+    #test_dir = Path.cwd().parent / "TestData" / "normalized_fantasy_30_40_half_auc"
+    #save_folder = Path.cwd().parent / "TestData" / "Graphs" / "Norm_Fant_2d_Evolved"
+    #plot_func = plot_tform_2d
+    fantasy_label_path = Path.cwd().parent / "RBMTrainingDataset" / "2018_labels_eos.csv"
+    combine_label_path = Path.cwd().parent / "NFL_Combine_Data" / "2019Both.csv"
+    fantasy_label_header = None
+    combine_label_header = 0
+    #label_header = None
+    #plot_best_performers(test_dir , save_folder ,  plot_func , label_path , label_header)
+
+
+    tests_to_graph = [
+		[Path.cwd().parent / "TestData" / "normalized_combine_flat_40_half_auc" , Path.cwd().parent / "TestData" / "Graphs" / "Norm_Comb_2d_Flat" , plot_tform_2d_combine , combine_label_path , combine_label_header] ,
+		[Path.cwd().parent / "TestData" / "normalized_combine_30_40_half_auc" , Path.cwd().parent / "TestData" / "Graphs" / "Norm_Comb_2d_Evolved" ,  plot_tform_2d_combine , combine_label_path , combine_label_header] ,
+		[Path.cwd().parent / "TestData" / "normalized_combine_3D_flat_40" , Path.cwd().parent / "TestData" / "Graphs" / "Norm_Comb_3d_Flat" , plot_tform_3d_combine , combine_label_path , combine_label_header] ,
+		[Path.cwd().parent / "TestData" / "normalized_combine_3D_30_40_half_auc" , Path.cwd().parent / "TestData" / "Graphs" / "Norm_Comb_3d_Evolved" , plot_tform_3d_combine , combine_label_path , combine_label_header] ,
+		[Path.cwd().parent / "TestData" / "hyper_mutate_normalized_combine_3D_30_40_half_auc" , Path.cwd().parent / "TestData" / "Graphs" / "Norm_Comb_3d_Hyper_Evolved" , plot_tform_3d_combine , combine_label_path , combine_label_header] ,
+		[Path.cwd().parent / "TestData" / "normalized_fantasy_flat_40_half_auc" , Path.cwd().parent / "TestData" / "Graphs" / "Norm_Fant_2d_Flat" , plot_tform_2d , fantasy_label_path , fantasy_label_header] ,
+		[Path.cwd().parent / "TestData" / "normalized_fantasy_3D_flat_40_half_auc" , Path.cwd().parent / "TestData" / "Graphs" / "Norm_Fant_3d_Flat" , plot_tform_3d , fantasy_label_path , fantasy_label_header] ,
+		[Path.cwd().parent / "TestData" / "normalized_fantasy_3D_30_40_half_auc", Path.cwd().parent / "TestData" / "Graphs" / "Norm_Fant_3d_Evolved" , plot_tform_3d , fantasy_label_path , fantasy_label_header]
+	]
+
+    for test_dir , save_folder_path , plot_func , label_path, label_header in tests_to_graph:
+        save_folder_path.mkdir()
+        plot_best_performers(test_dir , save_folder_path , plot_func , label_path , label_header)
+
+    '''
     testdir = Path.cwd().parent / "TestData" / "normalized_fantasy_30_40_half_auc"
     test_integrity(testdir)
+    '''
     '''
     testdir = Path.cwd().parent / "TestData" / "normalized_fantasy_30_40_half_auc"
     savedir = Path.cwd() / "best_plots_question_mark"
